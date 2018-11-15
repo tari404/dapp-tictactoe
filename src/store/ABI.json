@@ -1,0 +1,126 @@
+[{
+  "constant": true,
+  "inputs": [],
+  "name": "name",
+  "outputs": [{
+    "name": "",
+    "type": "string"
+  }],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+}, {
+  "constant": true,
+  "inputs": [{
+    "name": "_gameID",
+    "type": "uint256"
+  }],
+  "name": "getGameDetailById",
+  "outputs": [{
+    "name": "player1",
+    "type": "address"
+  }, {
+    "name": "player2",
+    "type": "address"
+  }, {
+    "name": "gameResult",
+    "type": "uint8"
+  }, {
+    "name": "gameBoard",
+    "type": "uint8[9]"
+  }],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+}, {
+  "constant": true,
+  "inputs": [],
+  "name": "gameCount",
+  "outputs": [{
+    "name": "",
+    "type": "uint256"
+  }],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+}, {
+  "constant": false,
+  "inputs": [{
+    "name": "_gameID",
+    "type": "uint256"
+  }, {
+    "name": "_index",
+    "type": "uint8"
+  }],
+  "name": "nextStep",
+  "outputs": [],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+}, {
+  "constant": true,
+  "inputs": [],
+  "name": "symbol",
+  "outputs": [{
+    "name": "",
+    "type": "string"
+  }],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+}, {
+  "constant": false,
+  "inputs": [],
+  "name": "joinAGame",
+  "outputs": [{
+    "name": "gameIndex",
+    "type": "uint256"
+  }],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+}, {
+  "constant": true,
+  "inputs": [{
+    "name": "_user",
+    "type": "address"
+  }],
+  "name": "gamesOf",
+  "outputs": [{
+    "name": "games",
+    "type": "uint256[]"
+  }],
+  "payable": false,
+  "stateMutability": "view",
+  "type": "function"
+}, {
+  "anonymous": false,
+  "inputs": [{
+    "indexed": true,
+    "name": "player1",
+    "type": "address"
+  }, {
+    "indexed": true,
+    "name": "player2",
+    "type": "address"
+  }, {
+    "indexed": false,
+    "name": "gameID",
+    "type": "uint256"
+  }],
+  "name": "GameCreate",
+  "type": "event"
+}, {
+  "anonymous": false,
+  "inputs": [{
+    "indexed": true,
+    "name": "player",
+    "type": "address"
+  }, {
+    "indexed": false,
+    "name": "nextGameID",
+    "type": "uint256"
+  }],
+  "name": "WaitingPlayer",
+  "type": "event"
+}]
