@@ -203,7 +203,7 @@ input
   background-color #fff
   padding 20px
   box-shadow 0 2px 4px #0001
-  margin-bototm 100px
+  margin-bottom 100px
 .game-content-title
   font-size 18px
   line-height 30px
