@@ -104,8 +104,9 @@ export default {
         }, 3000)
       })
     },
-    updateUser ({ state }, index) {
+    updateUser ({ rootState, state }, index) {
       state.userIndex = index
+      rootState.userIndex = index
     },
     gameByID (_, id) {
       return findOrCreateGameInfo(id)
@@ -130,8 +131,8 @@ export default {
         dispatch('checkNetwork')
       })
     },
-    async joinAGame ({ state, dispatch }) {
-      const address = defaultUser[state.userIndex].address
+    async joinAGame ({ rootState, dispatch }) {
+      const address = defaultUser[rootState.userIndex].address
       return contract.methods.joinAGame().send({
         from: address,
         gasPrice: 1,
@@ -141,8 +142,8 @@ export default {
         return err
       })
     },
-    async nextStep ({ state, dispatch }, { gameID, index }) {
-      const address = defaultUser[state.userIndex].address
+    async nextStep ({ rootState, dispatch }, { gameID, index }) {
+      const address = defaultUser[rootState.userIndex].address
       return contract.methods.nextStep(gameID, index).send({
         from: address,
         gasPrice: 1,

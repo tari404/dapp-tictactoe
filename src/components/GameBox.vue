@@ -1,34 +1,25 @@
 <template>
-  <div class="game-box" :class="{
-    'game-box-start': !data.result && !waiting,
-    'game-box-active': !data.result && ownRound && !waiting
-  }">
-    <p class="game-box-id">
-      游戏ID：{{data.id}}
-      <span>{{offensive ? '先手' : '后手'}}</span>
-    </p>
-    <div>
-      <div class="game-box-wait" v-if="waiting">
-        等待玩家中...
-      </div>
-      <ul class="game-box-info" v-else>
-        <li>对手：{{opponent.substr(0, 6)}}...</li>
-        <li><br></li>
-        <li v-if="data.result">
-          <span>游戏结束：</span>
-          <span>{{result}}</span>
-        </li>
-        <li v-else>
-          <span>{{ownRound ? '我方' : '对方'}}回合</span>
-        </li>
-      </ul>
-      <div class="game-box-map">
-        <span v-for="i in 9" :key="i" :class="{
-          'game-box-o': board[i - 1] === '1',
-          'game-box-x': board[i - 1] === '2'
-        }" />
-      </div>
+  <div class="game-box">
+    <div class="user">
+      <div class="round our-round" v-if="ownRound && !this.data.result">执棋</div>
+      <img :src="user.img">
+      <p>{{user.name}}</p>
     </div>
+    <span>VS</span>
+    <div class="user" v-if="waiting">
+      <img>
+      <p>等待玩家加入</p>
+    </div>
+    <div class="user" v-else>
+      <div class="round opp-round" v-if="!ownRound && !this.data.result">执棋</div>
+      <img :src="opponent.img">
+      <p>{{opponent.name}}</p>
+    </div>
+    <div v-if="this.data.result" class="result" :class="{
+      'result-victory': result === 2,
+      'result-fail': result === 0,
+      'result-draw': result === 1,
+    }"/>
   </div>
 </template>
 
@@ -40,11 +31,10 @@ export default {
   props: ['data'],
   computed: {
     ...mapGetters({
+      user: 'user',
+      userByAddress: 'userByAddress',
       address: 'web3/address'
     }),
-    board () {
-      return this.data.board
-    },
     waiting () {
       return this.data.p2 === '0x0000000000000000000000000000000000000000'
     },
@@ -52,7 +42,7 @@ export default {
       return this.data.p1 === this.address
     },
     ownRound () {
-      const round = this.board.reduce((sum, value) => {
+      const round = this.data.board.reduce((sum, value) => {
         if (value === '1') {
           return sum + 1
         } else if (value === '2') {
@@ -64,19 +54,19 @@ export default {
     },
     opponent () {
       if (this.offensive) {
-        return this.data.p2
+        return this.userByAddress(this.data.p2)
       } else {
-        return this.data.p1
+        return this.userByAddress(this.data.p1)
       }
     },
     result () {
       switch (this.data.result) {
         case 1:
-          return this.offensive ? '胜利' : '失败'
+          return this.offensive ? 2 : 0
         case 2:
-          return this.offensive ? '失败' : '胜利'
+          return this.offensive ? 0 : 2
         default:
-          return '平局'
+          return 1
       }
     }
   }
@@ -85,63 +75,64 @@ export default {
 
 <style lang="stylus" scoped>
 .game-box
-  padding 6px
-  border solid 1px #ddd
-  border-radius 5px
-  >div
-    display flex
-.game-box-start
-  border-color #0d85da
-.game-box-active
-  background-color #f4fbff
-  .game-box-map
-    background-color #80bdea
-.game-box-id
-  font-size 14px
-  flex 0 0 100%
-  margin 0 0 6px 0
-  span
-    float right
-.game-box-wait
-  font-size 12px
-  line-height 64px
-  padding 2px 0
-  flex 1 1 auto
-.game-box-info
-  font-size 12px
-  line-height 20px
-  padding 2px 0
-  flex 1 1 auto
-  li
-    margin 2px
-    overflow hidden
-.game-box-map
-  width 64px
-  padding 4px
-  border-radius 4px
-  background-color #eee
-  display grid
-  grid-template-columns repeat(3, 20px)
-  grid-gap 2px
-  span
-    display block
-    background-color #fff
-    height 20px
+  height 130px
+  box-sizing border-box
+  padding 20px
+  border solid 1px #bfbfbf
+  border-radius 10px
+  box-shadow 0 6px 20px 0 #0001
+  display flex
+  position relative
+  .user
+    flex 0 0 60px
     position relative
-    &:after
-      width 20px
-      height 20px
-      position absolute
-      top 0
-      left 0
-      text-align center
-      font-size 14px
-      line-height 22px
-      font-weight bold
-.game-box-o:after
-  content 'O'
-  color #ca0000
-.game-box-x:after
-  content 'X'
-  color #0000ca
+  img
+    display block
+    width 60px
+    height 60px
+    border-radius 30px
+    background-color #bfbfbf
+  p
+    display block
+    font-size 14px
+    color #666
+    text-align center
+    width 140%
+    margin 10px -20% 0
+  span
+    flex 1 1 auto
+    font-size 36px
+    text-align center
+    font-weight 500
+    line-height 88px
+
+.round
+  position absolute
+  width 50px
+  height 20px
+  text-align center
+  background-color #fc6541
+  border-radius 6px
+  color #fff
+  font-size 14px
+  font-weight 500
+.our-round
+  left -16px
+.opp-round
+  right -16px
+
+.result
+  position absolute
+  width 128px
+  height 39px
+  background-repeat no-repeat
+  top -16px
+  left 50%
+  transform translateX(-50%)
+.result-victory
+  background-image url('../assets/result_victory.png')
+.result-fail
+  background-image url('../assets/result_fail.png')
+.result-draw
+  background-image url('../assets/result_draw.png')
 </style>

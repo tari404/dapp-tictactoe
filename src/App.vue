@@ -2,33 +2,45 @@
   <div id="app">
     <nav>
       <div class="main-width">
-        <h1>链上井字棋小游戏</h1>
-        <div class="game-user">
-          使用<span :class="{'focus': userIndex === 0}" @click="toggleUser(0)">用户1</span>
-          <span :class="{'focus': userIndex === 1}" @click="toggleUser(1)">用户2</span>
-          <span :class="{'focus': userIndex === 2}" @click="toggleUser(2)">用户3</span>
-          <span :class="{'focus': userIndex === 3}" @click="toggleUser(3)">用户4</span>账号
-        </div>
+        <h1>区块链井字棋</h1>
       </div>
     </nav>
-    <section>
-      <div class="main-width game-account">
-        账户地址：{{address}}
+    <section v-if="beforeEnter">
+      <div class="game-intro game-content main-width">
+        <div class="game-box-map">
+          <span v-for="i in 9" :key="i" :class="{
+            'game-box-o': board[i - 1] === 1,
+            'game-box-x': board[i - 1] === 2
+          }" />
+        </div>
+        <p>游戏介绍：<br>井字棋是一种在3*3格子上进行的连珠游戏，和五子棋类似。分别代表O和X的两个游戏者轮流在格子里标记（先手者为O），任意三个标记形成一条直线，则为获胜。</p>
+        <div class="game-intro-start" @click="start">开始游戏</div>
       </div>
     </section>
-    <section>
-      <div class="main-width">
-        <span class="game-network-name">合约名称：{{contractName}}</span>
-        <span class="game-network-state" :style="{
-          'color': networkState === 1 ? '#2fa4d9' : '#d80315'
-        }">{{networkNotice}}</span>
+    <section v-else-if="beforeLogin">
+      <div class="game-login game-content main-width">
+        <h2>登录</h2>
+        <p>选择账号</p>
+        <div class="game-login-select" :class="{
+          'game-login-select-open': showOptions
+        }" @click="clickSelector">
+          <ul class="game-login-options" :style="{
+            'transform': `translateY(${-selected * 80}px)`
+          }">
+            <li v-for="(user, index) in defaultUsers" :key="index"
+              @click="selectOption($event, index)">
+              <img :src="user.img">
+              <span>{{user.name}}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="game-login-start" @click="login">进入</div>
       </div>
     </section>
-    <section v-if="!beforeRefresh">
+    <section v-else-if="!beforeRefresh">
       <game-list @focus="onFocusGame" />
     </section>
     <notice />
-    <copyboard />
     <game v-if="focusGame" :data="focusGame" @close="onBlurGame" />
   </div>
 </template>
@@ -36,7 +48,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
 import Notice from '@/components/Notice'
-import Copyboard from '@/components/Copyboard'
 import GameList from '@/components/GameList'
 import Game from '@/components/Game'
 
@@ -44,30 +55,22 @@ export default {
   name: 'App',
   data () {
     return {
+      board: [2, 1, 0, 1, 1, 2, 0, 2, 0],
+      beforeEnter: true,
+      beforeLogin: true,
       beforeRefresh: false,
       userIndex: 0,
+
+      showOptions: false,
+      selected: 0,
 
       focusGame: null
     }
   },
   computed: {
     ...mapState({
-      contractName: state => state.web3.name,
-      networkState: state => state.web3.state
-    }),
-    ...mapGetters({
-      address: 'web3/address'
-    }),
-    networkNotice () {
-      switch (this.networkState) {
-        case 1:
-          return '网络连接正常'
-        case 2:
-          return '网络连接异常'
-        default:
-          return ''
-      }
-    }
+      defaultUsers: state => state.defaultUsers
+    })
   },
   created () {
     this.checkNetwork()
@@ -79,16 +82,29 @@ export default {
       queryGameCount: 'web3/queryGameCount',
       updateUser: 'web3/updateUser'
     }),
-    toggleUser (index) {
-      if (this.index === index) {
+    start () {
+      this.beforeEnter = false
+    },
+    login () {
+      this.updateUser(this.selected)
+      this.beforeLogin = false
+    },
+    clickSelector (event) {
+      if (!this.showOptions) {
+        this.showOptions = true
+        event.stopPropagation()
+        document.addEventListener('click', this.closeSelector)
+      }
+    },
+    closeSelector () {
+      this.showOptions = false
+      document.removeEventListener('click', this.closeSelector)
+    },
+    selectOption (event, index) {
+      if (!this.showOptions) {
         return
       }
-      this.beforeRefresh = true
-      this.$nextTick(() => {
-        this.beforeRefresh = false
-      })
-      this.userIndex = index
-      this.updateUser(index)
+      this.selected = index
     },
     onFocusGame (game) {
       this.focusGame = game
@@ -99,7 +115,6 @@ export default {
   },
   components: {
     Notice,
-    Copyboard,
     GameList,
     Game
   }
@@ -127,7 +142,7 @@ li
 
 .main-width
   margin auto
-  flex 0 1 800px
+  flex 0 1 1200px
   min-width 480px
   box-sizing border-box
 
@@ -135,33 +150,18 @@ li
   line-height 20px
 
 nav
-  height 80px
-  padding 0 10px
+  height 90px
+  padding 0 15px
   display flex
+  margin-bottom 60px
   background-color #fff
   box-shadow 0 2px 4px #0001
   h1
-    margin 0
-    display inline
+    color #333
     font-size 20px
-    font-weight 400
+    font-weight 600
     line-height 40px
-  .game-user
-    margin 5px 0
-    float right
-    line-height 20px
-    color #666
-    span
-      display inline-block
-      padding 4px
-      margin 0 2px
-      border dashed 1px #ddd
-      border-radius 3px
-      cursor pointer
-    .focus
-      background-color #0d85da
-      border-color #0d85da
-      color #fff
+    text-align center
 section
   margin 20px 10px
   display flex
@@ -183,78 +183,140 @@ input
   margin 0
   padding 0 9px
 
-.game-account
-  padding 10px 20px
-  border-radius 5px
-  border dashed 1px #aaa
-  color #666
-
-.game-network-name
-  font-size 16px
-  line-height 24px
-.game-network-state
-  float right
-  font-size 14px
-  line-height 24px
-
 .game-content
   background-color #fff
-  border-radius 5px
+  border-radius 10px
   background-color #fff
-  padding 20px
+  padding 40px 30px
   box-shadow 0 2px 4px #0001
-  margin-bottom 100px
-.game-content-title
-  font-size 18px
-  line-height 30px
+  margin-bottom 20px
   position relative
-  &:before
-    content ''
-    position absolute
-    top 8px
-    left -22px
-    width 0
-    height 0
-    border-left solid 6px #0d85da
-    border-top solid 6px transparent
-    border-bottom solid 6px transparent
 
 .game-notice
   margin-top 4px
   font-size 12px
   color #666
 
-.game-button
-  border-radius 3px
-  color #fff
-  width 150px
-  height 40px
-  text-align center
-  line-height 40px
-  background-color #ccc
-  transition background-color .4s
+.game-intro
+  padding 20px 100px
+  p
+    font-size 18px
+    line-height 30px
+    color #666
+  .game-intro-start
+    width 300px
+    height 60px
+    background #1E64B4
+    border-radius 10px
+    line-height 60px
+    text-align center
+    color #fff
+    font-size 18px
+    cursor pointer
+    margin 100px auto 80px
+
+.game-box-map
+  width 100px
+  margin 40px auto
+  padding 4px
+  border-radius 4px
+  background-color #eee
+  display grid
+  grid-template-columns repeat(3, 32px)
+  grid-gap 2px
+  span
+    display block
+    background-color #fff
+    height 32px
+    position relative
+    &:after
+      width 32px
+      height 32px
+      position absolute
+      top 0
+      left 0
+      text-align center
+      font-size 24px
+      line-height 35px
+      font-weight bold
+.game-box-o:after
+  content 'O'
+  color #ca0000
+.game-box-x:after
+  content 'X'
+  color #0000ca
+
+.game-login
+  flex 0 1 800px
+  margin auto
+  padding 20px 150px
+  h2
+    margin 60px auto
+    font-weight 400
+    text-align center
+    font-size 24px
+    color #333
+  p
+    margin 20px 0
+    font-size 18px
+    color #666
+  .game-login-start
+    width 300px
+    height 60px
+    background #1E64B4
+    border-radius 10px
+    line-height 60px
+    text-align center
+    color #fff
+    font-size 18px
+    cursor pointer
+    margin 60px auto 80px
+
+.game-login-select
+  cursor pointer
+  height 80px
+  border solid 1px #d2d2d2
+  border-radius 10px
+  overflow hidden
   position relative
-  div
-    border-radius 3px
-    transition background-color .4s,transform .4s
-    background-color #bbb
-  .need-to-pay:after
+  &:after
     content ''
     position absolute
-    top 5px
-    right 8px
-    width 26px
-    height 26px
-    background-image url(./assets/pay.svg)
-    background-size contain
-    background-position center
-    background-repeat no-repeat
-.game-button-active
-  background-color #0072c1
-  div
-    background-color #0d85da
-    cursor pointer
-    transform translateY(-6px)
-    &:hover
-      transform translateY(-3px)
+    right 24px
+    top 35px
+    width 0
+    height 0
+    border-top solid 13px #bfbfbf
+    border-left solid 10px transparent
+    border-right solid 10px transparent
+    transition transform .4s, opacity .4s
+.game-login-select-open
+  overflow visible
+  li:nth-child(even)
+    background-color #f9f9f9
+  &:after
+    transform scaleY(0)
+    opacity 0
+.game-login-options
+  border solid 1px #d2d2d2
+  border-radius 10px
+  overflow hidden
+  position absolute
+  left -1px
+  top -1px
+  width 100%
+  transition transform .4s
+  li
+    height 80px
+    line-height 80px
+    display flex
+    background-color #fff
+  img
+    width 40px
+    height 40px
+    border-radius 20px
+    margin 20px 24px
+  span
+    font-size 18px
+    color #333
 </style>

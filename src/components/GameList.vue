@@ -1,28 +1,27 @@
 <template>
-  <div class="game-content main-width">
-    <div class="game-content-title">我的游戏列表</div>
-    <div class="game-list-notice" v-if="gamesLoaded === 1">加载中...</div>
-    <div class="game-list-notice" v-else-if="gamesLoaded === 2 && !games.length">没有游戏记录</div>
-    <ul class="game-lists" v-else>
-      <li v-for="(game, index) in games" :key="index" @click="clickGame(game)">
-        <game-box :data="game" />
-      </li>
-    </ul>
-    <br class="game-blank">
-    <div class="game-content-title">搜索已有的游戏 <span class="game-total-count">总游戏数：{{gameCount}}</span></div>
-    <div class="game-search">
-      <label for="input-game-id">游戏ID</label>
-      <input id="input-game-id" type="text" v-model="inputID">
-      <div class="game-button" :class="{ 'game-button-active': inputIDValid && !querying }">
-        <div @click="queryGame">{{ querying ? '查询中...' : '查询' }}</div>
-      </div>
+  <div class="main-width">
+    <div class="game-content game-account">
+      <h2>当前账户</h2>
+      <div><img :src="user.img"><span>{{user.name}}</span></div>
+      <p>当前账户地址：{{address}}</p>
     </div>
-    <br class="game-blank">
-    <div class="game-content-title">参与一场新的游戏</div>
-    <div class="game-button game-join" :class="{ 'game-button-active': !invoking }">
-      <div class="need-to-pay" @click="join">{{ invoking ? '处理中...' : '参与' }}</div>
+    <div class="game-content">
+      <h2>游戏列表</h2>
+      <div class="game-create-new" @click="join">{{invoking ? '处理中...' : '开始新游戏'}}</div>
+      <div class="game-list-notice" v-if="gamesLoaded === 1">加载中...</div>
+      <ul class="game-lists" v-else>
+        <li v-for="(game, index) in games" :key="index" @click="clickGame(game)" v-if="!game.result">
+          <game-box :data="game" />
+        </li>
+      </ul>
+      <h2>游戏记录</h2>
+      <div class="game-list-notice" v-if="gamesLoaded === 1">加载中...</div>
+      <ul class="game-lists" v-else>
+        <li v-for="(game, index) in games" :key="index" @click="clickGame(game)" v-if="game.result">
+          <game-box :data="game" />
+        </li>
+      </ul>
     </div>
-    <div class="game-notice">参与后会自动加入等待中的游戏或者创建一个新的游戏，你不能加入自己的游戏，所以请不要连续请求！</div>
   </div>
 </template>
 
@@ -38,9 +37,10 @@ export default {
       itvl: 0,
 
       games: [],
+      gameLength: 0,
+      endGameLength: 0,
       gamesLoaded: 0,
       inputID: '',
-      querying: false,
       invoking: false
     }
   },
@@ -49,6 +49,7 @@ export default {
       gameCount: state => state.web3.gameCount
     }),
     ...mapGetters({
+      user: 'user',
       address: 'web3/address'
     }),
     inputIDValid () {
@@ -59,7 +60,7 @@ export default {
     this.update()
     this.itvl = setInterval(() => {
       this.update()
-    }, 4000)
+    }, 6000)
   },
   methods: {
     ...mapActions({
@@ -79,17 +80,6 @@ export default {
     },
     clickGame (game) {
       this.$emit('focus', game)
-    },
-    queryGame () {
-      if (this.querying || !this.inputIDValid) {
-        return
-      }
-      this.querying = true
-      this.gameByID(this.inputID).then(res => {
-        this.inputID = ''
-        this.$emit('focus', res)
-        this.querying = false
-      })
     },
     join () {
       if (this.invoking) {
@@ -126,39 +116,76 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.game-list-notice
-  margin-top 10px
+.main-width
+  margin-bottom 100px
+h2
+  margin 0 0 20px
+  font-weight 500
+  font-size 20px
+  line-height 20px
+
+.game-account
+  font-size 18px
+  color #333
+  div
+    margin 30px 0
+    display flex
+  img
+    width 40px
+    height 40px
+    border-radius 20px
+    margin-right 20px
+  span
+    line-height 40px
+  p
+    margin 0
+    line-height 20px
+
+.game-create-new
+  position absolute
+  top 30px
+  right 30px
+  width 150px
+  height 40px
+  box-sizing border-box
+  border-radius 20px
+  border solid 1px #999
+  color #333
+  opacity .6
+  line-height 38px
   text-align center
-  font-size 14px
+  cursor pointer
+  transition opacity .4s
+  &:hover
+    opacity 1
+
+.game-list-notice
+  text-align center
+  margin 40px 0
+  border solid 1px #dfdfdf
+  border-radius 10px
+  line-height 100px
+  font-size 18px
   color #666
-  border solid 1px #ddd
-  border-radius 3px
-  padding 10px
-  line-height 24px
+
 .game-lists
   display grid
+  grid-gap 40px
   grid-template-columns repeat(4, 1fr)
-  grid-gap 4px
-  margin-top 10px
+  margin 40px 0
   li
+    flex 0 0 260px
     cursor pointer
 
-.game-search
-  margin-top 10px
-  display flex
-  .game-button
-    margin-left 20px
-.game-total-count
-  float right
-  font-size 12px
-
-.game-join
-  margin-top 10px
-
-@media screen and (max-width 800px)
+@media screen and (max-width: 1100px)
   .game-lists
     grid-template-columns repeat(3, 1fr)
-@media screen and (max-width 600px)
+
+@media screen and (max-width: 900px)
   .game-lists
     grid-template-columns repeat(2, 1fr)
+
+@media screen and (max-width: 560px)
+  .game-lists
+    grid-template-columns repeat(1, 1fr)
 </style>
