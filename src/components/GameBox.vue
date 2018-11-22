@@ -1,7 +1,7 @@
 <template>
   <div class="game-box">
     <div class="user">
-      <div class="round our-round" v-if="ownRound && !this.data.result">执棋</div>
+      <div class="round our-round" v-if="ownRound && !data.result">执棋</div>
       <img :src="user.img">
       <p>{{user.name}}</p>
     </div>
@@ -11,11 +11,11 @@
       <p>等待玩家加入</p>
     </div>
     <div class="user" v-else>
-      <div class="round opp-round" v-if="!ownRound && !this.data.result">执棋</div>
+      <div class="round opp-round" v-if="!ownRound && !data.result">执棋</div>
       <img :src="opponent.img">
       <p>{{opponent.name}}</p>
     </div>
-    <div v-if="this.data.result" class="result" :class="{
+    <div v-if="data.result" class="result" :class="{
       'result-victory': result === 2,
       'result-fail': result === 0,
       'result-draw': result === 1,
