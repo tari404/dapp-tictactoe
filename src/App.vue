@@ -3,6 +3,12 @@
     <nav>
       <div class="main-width">
         <h1>{{$t('title')}}</h1>
+        <div class="game-i18n">
+          <span :class="{ 'focus': $i18n.locale === 'sc' }"
+            @click="toggleLang('sc')">简体中文</span>
+          <span :class="{ 'focus': $i18n.locale === 'en' }"
+            @click="toggleLang('en')">English</span>
+        </div>
       </div>
     </nav>
     <section v-if="beforeEnter">
@@ -82,6 +88,10 @@ export default {
       queryGameCount: 'web3/queryGameCount',
       updateUser: 'web3/updateUser'
     }),
+    toggleLang (locale) {
+      this.$i18n.locale = locale
+      document.title = this.$t('title')
+    },
     start () {
       this.beforeEnter = false
     },
@@ -162,10 +172,40 @@ nav
     font-weight 600
     line-height 40px
     text-align center
+  .main-width
+    position relative
+.game-i18n
+  position absolute
+  top 50%
+  right 0
+  transform translateY(-50%)
+  padding 0 4px
+  font-size 14px
+  display flex
+  span
+    display block
+    line-height 30px
+    height 30px
+    border solid 1px #bfbfbf
+    box-sizing border-box
+    color #666
+    cursor pointer
+  span:first-child
+    border-right none
+    padding 0 4px 0 8px
+    border-radius 15px 0 0 15px
+  span:last-child
+    border-left none
+    padding 0 8px 0 4px
+    border-radius 0 15px 15px 0
+  .focus
+    background-color #1e64b4
+    color #fff
+    border-color #1e64b4
+
 section
   margin 20px 10px
   display flex
-
 label
   display block
   line-height 40px
@@ -255,10 +295,12 @@ input
     font-weight 400
     text-align center
     font-size 24px
+    line-height 30px
     color #333
   p
     margin 20px 0
     font-size 18px
+    line-height 20px
     color #666
   .game-login-start
     width 300px
