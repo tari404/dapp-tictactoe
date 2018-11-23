@@ -1,0 +1,36 @@
+{
+  "title": "Blockchain tictactoe",
+  "intro": "Game introduction",
+  "introduction": "Tic-tac-toe is a game played on a 3 by 3 grid, similar to gobang. The two players  take turns to fill in the grid respectively with O and X (O go first), and any three marks forming a straight line are considered as winning.",
+  "start": "Start",
+  "login": "Log in",
+  "Account": {
+    "select": "Select account",
+    "player": [
+      "Eagle",
+      "Doggie",
+      "Fox",
+      "Bunny"
+    ],
+    "waiting": "waiting...",
+    "current": "Current account",
+    "address": "Address"
+  },
+  "loading": "Loading...",
+  "processing": "Processing...",
+  "gamelist": "Game List",
+  "newgame": "New game",
+  "hold": "Hold",
+  "record": "Game record",
+  "Notice": {
+    "success": "Successful",
+    "unknow": "Failed. Please try to refresh the page and try again",
+    "neterror": "Failed. It may be due to the network and other reasons"
+  },
+  "Gamenotice": {
+    "join": "Have joined the game",
+    "wait": "Waiting for another player to join",
+    "error": "Failure to create or join new game. Please check if there is a waiting game",
+    "neterror": "Failure to create or join new game. It may be due to the network and other reasons"
+  }
+}

@@ -1,21 +1,24 @@
 <template>
   <div class="main-width">
     <div class="game-content game-account">
-      <h2>当前账户</h2>
-      <div><img :src="user.img"><span>{{user.name}}</span></div>
-      <p>当前账户地址：{{address}}</p>
+      <h2>{{$t('Account.current')}}</h2>
+      <div>
+        <img :src="user.img">
+        <span>{{$t(`Account.player[${user.index}]`)}}</span>
+      </div>
+      <p>{{$t('Account.address')}} {{address}}</p>
     </div>
     <div class="game-content">
-      <h2>游戏列表</h2>
-      <div class="game-create-new" @click="join">{{invoking ? '处理中...' : '开始新游戏'}}</div>
-      <div class="game-list-notice" v-if="gamesLoaded === 1">加载中...</div>
+      <h2>{{$t('gamelist')}}</h2>
+      <div class="game-create-new" @click="join">{{invoking ? $t('processing') : $t('newgame')}}</div>
+      <div class="game-list-notice" v-if="gamesLoaded === 1">{{$t('loading')}}</div>
       <ul class="game-lists" v-else>
         <li v-for="(game, index) in games" :key="index" @click="clickGame(game)" v-if="!game.result">
           <game-box :data="game" />
         </li>
       </ul>
-      <h2>游戏记录</h2>
-      <div class="game-list-notice" v-if="gamesLoaded === 1">加载中...</div>
+      <h2>{{$t('record')}}</h2>
+      <div class="game-list-notice" v-if="gamesLoaded === 1">{{$t('loading')}}</div>
       <ul class="game-lists" v-else>
         <li v-for="(game, index) in games" :key="index" @click="clickGame(game)" v-if="game.result">
           <game-box :data="game" />
@@ -92,16 +95,16 @@ export default {
           const events = res.events
           if (events.GameCreate) {
             const id = events.GameCreate.returnValues.gameID
-            this.notice(['log', `已加入游戏 ID-${id}`, 10000])
+            this.notice(['log', `${this.$t('Gamenotice.join')} ID-${id}`, 10000])
           } else if (events.WaitingPlayer) {
             const id = events.WaitingPlayer.returnValues.nextGameID
-            this.notice(['log', `已创建游戏 ID-${id} 需等待另一名玩家加入`, 10000])
+            this.notice(['log', `${this.$t('Gamenotice.join')} ID-${id} ${this.$t('Gamenotice.wait')}`, 10000])
           }
           this.update()
         } else if (/reverted by the EVM/.test(res.message)) {
-          this.notice(['error', `未能创建或参与新游戏 请检查是否已经有一个等待中的游戏`, 10000])
+          this.notice(['error', this.$t('Gamenotice.error'), 10000])
         } else {
-          this.notice(['error', `未能创建或参与新游戏 可能是由于网络等原因导致的`, 10000])
+          this.notice(['error', this.$t('Gamenotice.neterror'), 10000])
         }
       })
     }

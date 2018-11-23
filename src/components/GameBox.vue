@@ -1,24 +1,22 @@
 <template>
   <div class="game-box">
     <div class="user">
-      <div class="round our-round" v-if="ownRound && !data.result">执棋</div>
+      <div class="round our-round" v-if="ownRound && !data.result">{{$t('hold')}}</div>
       <img :src="user.img">
-      <p>{{user.name}}</p>
+      <p>{{$t(`Account.player[${user.index}]`)}}</p>
     </div>
     <span>VS</span>
     <div class="user" v-if="waiting">
       <img>
-      <p>等待玩家加入</p>
+      <p>{{$t('Account.waiting')}}</p>
     </div>
     <div class="user" v-else>
-      <div class="round opp-round" v-if="!ownRound && !data.result">执棋</div>
+      <div class="round opp-round" v-if="!ownRound && !data.result">{{$t('hold')}}</div>
       <img :src="opponent.img">
-      <p>{{opponent.name}}</p>
+      <p>{{$t(`Account.player[${opponent.index}]`)}}</p>
     </div>
-    <div v-if="data.result" class="result" :class="{
-      'result-victory': result === 2,
-      'result-fail': result === 0,
-      'result-draw': result === 1,
+    <div v-if="data.result" class="result" :style="{
+      'background-image': `url(${require('../assets/result_' + result + '_' + $i18n.locale + '.png')})`
     }"/>
   </div>
 </template>
@@ -62,11 +60,11 @@ export default {
     result () {
       switch (this.data.result) {
         case 1:
-          return this.offensive ? 2 : 0
+          return this.offensive ? 'victory' : 'defeat'
         case 2:
-          return this.offensive ? 0 : 2
+          return this.offensive ? 'defeat' : 'victory'
         default:
-          return 1
+          return 'draw'
       }
     }
   }
@@ -129,10 +127,5 @@ export default {
   top -16px
   left 50%
   transform translateX(-50%)
-.result-victory
-  background-image url('../assets/result_victory.png')
-.result-fail
-  background-image url('../assets/result_fail.png')
-.result-draw
-  background-image url('../assets/result_draw.png')
+  background-size contain
 </style>

@@ -2,7 +2,7 @@
   <div id="app">
     <nav>
       <div class="main-width">
-        <h1>区块链井字棋</h1>
+        <h1>{{$t('title')}}</h1>
       </div>
     </nav>
     <section v-if="beforeEnter">
@@ -13,14 +13,14 @@
             'game-box-x': board[i - 1] === 2
           }" />
         </div>
-        <p>游戏介绍：<br>井字棋是一种在3*3格子上进行的连珠游戏，和五子棋类似。分别代表O和X的两个游戏者轮流在格子里标记（先手者为O），任意三个标记形成一条直线，则为获胜。</p>
-        <div class="game-intro-start" @click="start">开始游戏</div>
+        <p>{{$t('intro')}}<br>{{$t('introduction')}}</p>
+        <div class="game-intro-start" @click="start">{{$t('start')}}</div>
       </div>
     </section>
     <section v-else-if="beforeLogin">
       <div class="game-login game-content main-width">
-        <h2>登录</h2>
-        <p>选择账号</p>
+        <h2>{{$t('login')}}</h2>
+        <p>{{$t('Account.select')}}</p>
         <div class="game-login-select" :class="{
           'game-login-select-open': showOptions
         }" @click="clickSelector">
@@ -30,11 +30,11 @@
             <li v-for="(user, index) in defaultUsers" :key="index"
               @click="selectOption($event, index)">
               <img :src="user.img">
-              <span>{{user.name}}</span>
+              <span>{{$t(`Account.player[${user.index}]`)}}</span>
             </li>
           </ul>
         </div>
-        <div class="game-login-start" @click="login">进入</div>
+        <div class="game-login-start" @click="login">{{$t('start')}}</div>
       </div>
     </section>
     <section v-else-if="!beforeRefresh">

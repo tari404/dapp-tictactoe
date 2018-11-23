@@ -13,13 +13,13 @@
             'winner': result === 2 && data.result
           }" />
           <div class="info">
-            <p>{{user.name}}</p>
+            <p>{{$t(`Account.player[${user.index}]`)}}</p>
             <div>
               <div :class="{
                 'game-use-o': offensive,
                 'game-use-x': !offensive
               }"></div>
-              <div class="round" v-if="ownRound && !data.result">执棋</div>
+              <div class="round" v-if="ownRound && !data.result">{{$t('hold')}}</div>
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="user" v-if="waiting">
           <div class="image" />
           <div class="info">
-            <p>等待玩家加入</p>
+            <p>{{$t('Account.waiting')}}</p>
           </div>
         </div>
         <div class="user" v-else>
@@ -35,13 +35,13 @@
             'winner': result === 0 && data.result
           }" />
           <div class="info">
-            <p>{{opponent.name}}</p>
+            <p>{{$t(`Account.player[${opponent.index}]`)}}</p>
             <div>
               <div :class="{
                 'game-use-x': offensive,
                 'game-use-o': !offensive
               }"></div>
-              <div class="round" v-if="!ownRound && !data.result">执棋</div>
+              <div class="round" v-if="!ownRound && !data.result">{{$t('hold')}}</div>
             </div>
           </div>
         </div>
@@ -55,10 +55,8 @@
           'game-main-x': board[i - 1] === '2'
         }" @click="clickGrid(i)" />
       </div>
-      <div v-if="this.data.result" class="result" :class="{
-        'result-victory': result === 2,
-        'result-fail': result === 0,
-        'result-draw': result === 1,
+      <div v-if="this.data.result" class="result" :style="{
+        'background-image': `url(${require('../assets/result_' + result + '_' + $i18n.locale + '.png')})`
       }"/>
     </div>
   </div>
@@ -117,11 +115,11 @@ export default {
     result () {
       switch (this.data.result) {
         case 1:
-          return this.offensive ? 2 : 0
+          return this.offensive ? 'victory' : 'defeat'
         case 2:
-          return this.offensive ? 0 : 2
+          return this.offensive ? 'defeat' : 'victory'
         default:
-          return 1
+          return 'draw'
       }
     }
   },
@@ -146,12 +144,12 @@ export default {
         this.invoking = false
         if (res.status) {
           this.selectGrid = 0
-          this.notice(['log', '操作成功', 10000])
+          this.notice(['log', this.$t('Notice.success'), 10000])
           this.data.update()
         } else if (/reverted by the EVM/.test(res.message)) {
-          this.notice(['error', `操作失败 请尝试刷新页面并重试`, 10000])
+          this.notice(['error', this.$t('Notice.unknow'), 10000])
         } else {
-          this.notice(['error', `操作失败 可能是由于网络等原因导致的`, 10000])
+          this.notice(['error', this.$t('Notice.neterror'), 10000])
         }
       })
     },
@@ -324,16 +322,16 @@ export default {
   &:hover
     transform scaleY(.95)
 .game-main-map-disable:after
-  content '提交中...'
+  content ''
   width 100%
   height 100%
   position absolute
   top 0
   left 0
   background-color #fff4
-  text-align center
-  font-size 14px
-  color #000d
+  // text-align center
+  // font-size 14px
+  // color #000d
 .game-grid-selected-o:after
   content 'O'
   color #FC6541
@@ -357,10 +355,5 @@ export default {
   top -40px
   left 50%
   transform translateX(-50%)
-.result-victory
-  background-image url('../assets/result_victory_b.png')
-.result-fail
-  background-image url('../assets/result_fail_b.png')
-.result-draw
-  background-image url('../assets/result_draw_b.png')
+  background-size contain
 </style>
