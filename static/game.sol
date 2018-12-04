@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.5.0;
 
 contract TicTacToeToken {
     string public name = "TicTacToe";
@@ -27,7 +27,7 @@ contract TicTacToeToken {
         address player1,
         address player2,
         uint8 gameResult,
-        uint8[9] gameBoard
+        uint8[9] memory gameBoard
     ) {
         if (_gameID == gameCount) {
             player1 = waitingPlayer;
@@ -42,7 +42,7 @@ contract TicTacToeToken {
         }
     }
 
-    function gamesOf (address _user) public view returns (uint256[] games) {
+    function gamesOf (address _user) public view returns (uint256[] memory games) {
         games = _userGames[_user];
     }
 
