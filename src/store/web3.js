@@ -1,10 +1,10 @@
 import Web3 from 'web3'
 
 import ABI from './ABI.json'
+import config from '../../config.json'
 
-const contractAddress = '0x50AcEd80F4ce826b550f61fa256ab8FBe9A719fe'
-
-const web3 = new Web3('https://api.truescan.net/rpc')
+const contractAddress = config.contractAddress
+const web3 = new Web3(config.web3Provider)
 const contract = new web3.eth.Contract(ABI, contractAddress)
 
 const zeroAddress = '0x0000000000000000000000000000000000000000'
