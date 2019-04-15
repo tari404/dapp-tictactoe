@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import Web3 from 'web3true'
 
 import ABI from './ABI.json'
 import config from '../../config.json'
@@ -135,7 +135,7 @@ export default {
       const address = defaultUser[rootState.userIndex].address
       return contract.methods.joinAGame().send({
         from: address,
-        gasPrice: 1,
+        gasPrice: 1000000,
         gas: 3000000
       }).catch(err => {
         dispatch('checkNetwork')
@@ -146,7 +146,7 @@ export default {
       const address = defaultUser[rootState.userIndex].address
       return contract.methods.nextStep(gameID, index).send({
         from: address,
-        gasPrice: 1,
+        gasPrice: 1000000,
         gas: 3000000
       }).catch(err => {
         dispatch('checkNetwork')
